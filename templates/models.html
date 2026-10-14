@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Model Bench · VitalSign{% endblock %}
+{% block eyebrow %}Model evaluation{% endblock %}
+
+{% block content %}
+<div class="page model-page">
+  <section class="model-hero">
+    <div class="model-hero-copy">
+      <span class="section-kicker">VITALSIGN / MODEL LAB</span>
+      <h1>Model performance, clearly compared.</h1>
+      <p>Review each classifier on the same held-out patient cohort. Every model has its own metric summary, confusion matrix, and ROC curve.</p>
+      <div class="hero-actions">
+        <a href="#model-results" class="btn">Explore model results <span aria-hidden="true">↓</span></a>
+        <a href="{{ url_for('visualization') }}" class="btn secondary">Clinical data visuals</a>
+      </div>
+    </div>
+    <div class="model-hero-score">
+      <span class="score-caption">CURRENT LEADER</span>
+      <strong>{{ metrics.best_model }}</strong>
+      {% if metrics.best_model in metrics.metrics and metrics.metrics[metrics.best_model].accuracy is not none %}
+      <span class="leader-score">{{ metrics.metrics[metrics.best_model].accuracy }}<small>%</small></span>
+      <span class="score-caption">holdout accuracy</span>
+      {% else %}<span class="leader-pending">Training required</span>{% endif %}
+    </div>
+  </section>
+
+  <div class="benchmark-overview">
+    <div><strong>{{ evaluated_models }}<small> / {{ model_graphs|length }}</small></strong><span>Models evaluated</span></div>
+    <div><strong>{{ metrics.dataset_summary.test_samples if metrics.dataset_summary else 0 }}</strong><span>Holdout encounters</span></div>
+    <div><strong>{{ metrics.dataset_summary.features_count if metrics.dataset_summary else 0 }}</strong><span>Input features</span></div>
+    <div><strong>5-fold</strong><span>Cross-validation</span></div>
+  </div>
+
+  <section class="benchmark-section" id="model-results">
+    <div class="section-title-row">
+      <div><span class="section-kicker">CLASSIFIER BENCHMARK</span><h2>Compare all models</h2></div>
+      <span class="benchmark-note">Same cohort · same evaluation metrics</span>
+    </div>
+    <div class="table-wrap benchmark-table-wrap">
+      <table class="benchmark-table">
+        <thead><tr><th>Classifier</th><th class="num">Accuracy</th><th class="num">Precision</th><th class="num">Recall</th><th class="num">F1 score</th><th class="num">ROC AUC</th><th class="num">5-fold CV</th><th>Status</th></tr></thead>
+        <tbody>
+          {% for item in model_graphs %}{% set m = item.metrics %}
+          <tr {% if item.is_best %}class="leader-row"{% endif %}>
+            <td><a class="model-name-link" href="#{{ item.slug }}">{{ item.name }}{% if item.is_best %}<span class="leader-tag">TOP F1</span>{% endif %}</a></td>
+            <td class="num">{% if m.accuracy is not none %}{{ m.accuracy }}%{% else %}—{% endif %}</td>
+            <td class="num">{% if m.precision is not none %}{{ m.precision }}%{% else %}—{% endif %}</td>
+            <td class="num">{% if m.recall is not none %}{{ m.recall }}%{% else %}—{% endif %}</td>
+            <td class="num">{% if m.f1_score is not none %}{{ m.f1_score }}%{% else %}—{% endif %}</td>
+            <td class="num">{% if m.roc_auc is not none %}{{ m.roc_auc }}%{% else %}—{% endif %}</td>
+            <td class="num">{% if m.cv_accuracy_mean is defined and m.cv_accuracy_mean is not none %}{{ m.cv_accuracy_mean }}% <span class="cv-spread">± {{ m.cv_accuracy_std }}%</span>{% else %}—{% endif %}</td>
+            <td>{% if m.accuracy is none %}<span class="model-status status-pending">Not trained</span>{% elif item.is_best %}<span class="model-status status-leader">Top F1</span>{% else %}<span class="model-status status-ready">Evaluated</span>{% endif %}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section class="individual-results">
+    <div class="section-title-row">
+      <div><span class="section-kicker">INDIVIDUAL EVALUATION</span><h2>Each model, on its own</h2></div>
+      <span class="benchmark-note">Confusion matrix · ROC curve · test metrics</span>
+    </div>
+    {% for item in model_graphs %}{% set m = item.metrics %}
+    <article class="model-result-card {% if item.is_best %}is-leader{% endif %}" id="{{ item.slug }}">
+      <header class="model-result-head">
+        <div class="model-title-wrap"><span class="model-index">{{ '%02d'|format(loop.index) }}</span><div><h3>{{ item.name }}</h3><span class="model-subtitle">Binary readmission classification</span></div></div>
+        {% if item.is_best %}<span class="model-status status-leader">Highest F1 score</span>{% elif m.accuracy is none %}<span class="model-status status-pending">Awaiting training</span>{% else %}<span class="model-status status-ready">Evaluated</span>{% endif %}
+      </header>
+
+      {% if m.accuracy is not none %}
+      <div class="metric-ribbon">
+        <div><span>Accuracy</span><strong>{{ m.accuracy }}<small>%</small></strong></div>
+        <div><span>Precision</span><strong>{{ m.precision }}<small>%</small></strong></div>
+        <div><span>Recall</span><strong>{{ m.recall }}<small>%</small></strong></div>
+        <div><span>F1 score</span><strong>{{ m.f1_score }}<small>%</small></strong></div>
+        <div><span>ROC AUC</span><strong>{{ m.roc_auc }}<small>%</small></strong></div>
+        <div class="cv-metric"><span>5-fold CV</span><strong>{% if m.cv_accuracy_mean is defined and m.cv_accuracy_mean is not none %}{{ m.cv_accuracy_mean }}<small>%</small>{% else %}—{% endif %}</strong><em>{% if m.cv_accuracy_std is defined and m.cv_accuracy_std is not none %}± {{ m.cv_accuracy_std }}%{% endif %}</em></div>
+      </div>
+      <div class="model-graphs">
+        <div class="model-graph-panel">
+          <div class="graph-title"><span class="graph-icon">CM</span><div><strong>Confusion matrix</strong><small>Observed vs predicted outcomes</small></div></div>
+          {% if item.confusion %}<a class="graph-image-link" href="{{ url_for('static', filename='images/' ~ item.confusion) }}" target="_blank" rel="noopener"><img src="{{ url_for('static', filename='images/' ~ item.confusion) }}" alt="{{ item.name }} confusion matrix" loading="lazy"></a>{% else %}<div class="graph-pending">Train the models to generate this confusion matrix.</div>{% endif %}
+        </div>
+        <div class="model-graph-panel">
+          <div class="graph-title"><span class="graph-icon graph-icon-roc">ROC</span><div><strong>ROC curve</strong><small>True positive rate vs false positive rate</small></div></div>
+          {% if item.roc %}<a class="graph-image-link" href="{{ url_for('static', filename='images/' ~ item.roc) }}" target="_blank" rel="noopener"><img src="{{ url_for('static', filename='images/' ~ item.roc) }}" alt="{{ item.name }} ROC curve" loading="lazy"></a>{% else %}<div class="graph-pending">Train the models to generate this ROC curve.</div>{% endif %}
+        </div>
+      </div>
+      {% else %}
+      <div class="untrained-model"><div class="untrained-symbol">↗</div><div><strong>This classifier has not been evaluated yet.</strong><p>Run the VitalSign training pipeline to calculate holdout metrics and generate its individual charts.</p></div></div>
+      {% endif %}
+    </article>
+    {% endfor %}
+  </section>
+
+  <div class="notice-card"><span class="notice-mark">i</span><p>Metrics are computed from the saved model evaluation. A higher accuracy alone does not establish clinical usefulness; review recall, false negatives, and ROC AUC together. This project is for educational decision support.</p></div>
+</div>
+{% endblock %}

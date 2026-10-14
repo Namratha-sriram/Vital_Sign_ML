@@ -1,0 +1,25 @@
+=================================================================
+           VITALSIGN CLINICAL EXPLORATORY DATA ANALYSIS           
+=================================================================
+Total Ingested Records    : 50,000
+Feature Dimensions        : 21 attributes
+Missing Values Count      : 72574
+Duplicate Encounters      : 0
+Total Readmissions (1)    : 27,238 (54.48%)
+Stable Discharges (0)     : 22,762 (45.52%)
+
+--- PHYSIOLOGICAL VITALS SUMMARY (MEAN ± STD) ---
+Heart Rate (bpm)          : 86.0 ± 16.5
+Systolic BP (mmHg)        : 134.5 ± 23.2
+Diastolic BP (mmHg)       : 82.1 ± 13.0
+Blood Glucose (mg/dL)     : 182.0 ± 62.0
+SpO2 Saturation (%)       : 94.0% ± 3.2%
+Body Temperature (°C)     : 37.55°C ± 0.72°C
+Respiratory Rate (/min)   : 19.5 ± 4.6
+
+--- TOP CORRELATED FEATURES WITH 30-DAY READMISSION ---
+  blood_glucose            : +0.247
+  number_emergency         : +0.203
+  age                      : +0.175
+  systolic_bp              : +0.174
+  time_in_hospital         : +0.142

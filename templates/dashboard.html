@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Dashboard · VitalSign{% endblock %}
+{% block eyebrow %}Clinical overview{% endblock %}
+
+{% block content %}
+<div class="page">
+  <section class="page-heading">
+    <div><span class="section-kicker">COHORT MONITOR</span>
+      <h1>Patient outcomes at a glance</h1>
+      <p class="lede">An overview of the VitalSign dataset and the latest trained readmission model.</p>
+    </div>
+    <a href="{{ url_for('upload') }}" class="btn">Analyze a dataset <span aria-hidden="true">→</span></a>
+  </section>
+
+  <div class="stat-strip">
+    <div class="stat"><span class="stat-icon">01</span><span class="n">{{ stats.total_patients }}</span><span class="l">Patient encounters</span></div>
+    <div class="stat"><span class="stat-icon">02</span><span class="n">{{ stats.total_features }}</span><span class="l">Clinical features</span></div>
+    <div class="stat"><span class="stat-icon">03</span><span class="n">{{ stats.readmission_rate }}%</span><span class="l">Observed readmission rate</span></div>
+    <div class="stat"><span class="stat-icon">04</span><span class="n">{{ metrics.best_model }}</span><span class="l">Best trained model</span></div>
+  </div>
+
+  <div class="dashboard-grid">
+    <section class="card dashboard-panel">
+      <div class="panel-heading"><div><span class="idx">OUTCOME DISTRIBUTION</span><h2>Observed readmissions</h2></div><span class="badge-status badge-teal">Dataset</span></div>
+      <p class="panel-copy">Readmission labels in the current VitalSign cohort.</p>
+      <div class="chart-frame"><canvas id="outcomeChart" height="170"></canvas></div>
+      <div class="mini-stats"><span><i class="legend-dot stable-dot"></i> No readmission <strong>{{ "{:,}".format(stats.total_patients_count - stats.readmission_count_value) }}</strong></span><span><i class="legend-dot risk-dot"></i> Readmitted <strong>{{ stats.readmission_count }}</strong></span></div>
+    </section>
+
+    <section class="card dashboard-panel">
+      <div class="panel-heading"><div><span class="idx">CLINICAL SNAPSHOT</span><h2>Average vital signs</h2></div><a class="text-link" href="{{ url_for('visualization') }}">View analysis →</a></div>
+      <p class="panel-copy">Cohort averages from the loaded patient dataset.</p>
+      <div class="vital-list">
+        <div class="vital-row"><span>Heart rate</span><strong>{{ stats.avg_heart_rate }} <small>bpm</small></strong><div class="vital-track"><i style="width:{{ [stats.avg_heart_rate|float / 160 * 100, 100]|min }}%"></i></div></div>
+        <div class="vital-row"><span>Systolic blood pressure</span><strong>{{ stats.avg_systolic_bp }} <small>mmHg</small></strong><div class="vital-track"><i style="width:{{ [stats.avg_systolic_bp|float / 200 * 100, 100]|min }}%"></i></div></div>
+        <div class="vital-row"><span>Blood glucose</span><strong>{{ stats.avg_glucose }} <small>mg/dL</small></strong><div class="vital-track"><i style="width:{{ [stats.avg_glucose|float / 300 * 100, 100]|min }}%"></i></div></div>
+        <div class="vital-row"><span>Oxygen saturation</span><strong>{{ stats.avg_spo2 }} <small>%</small></strong><div class="vital-track"><i style="width:{{ [stats.avg_spo2|float, 100]|min }}%"></i></div></div>
+      </div>
+    </section>
+  </div>
+
+  <section class="card model-summary">
+    <div><span class="idx">MODEL STATUS</span><h2>{{ metrics.best_model }}</h2><p class="panel-copy">Selected using the saved holdout evaluation. Review the complete benchmark and charts before using model results.</p></div>
+    <div class="model-score"><span class="score-value">{{ metrics.metrics[metrics.best_model].accuracy }}%</span><span class="score-label">holdout accuracy</span></div>
+    <a href="{{ url_for('models') }}" class="btn secondary">Compare models</a>
+  </section>
+
+  <div class="notice-card"><span class="notice-mark">i</span><p><strong>Decision support only.</strong> This dashboard summarizes a historical dataset; it does not display live hospital telemetry or replace clinical assessment.</p></div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+const chart = document.getElementById('outcomeChart');
+if (chart) new Chart(chart, {
+  type: 'doughnut',
+  data: { labels: ['No readmission', 'Readmitted'], datasets: [{ data: [{{ stats.total_patients_count - stats.readmission_count_value }}, {{ stats.readmission_count_value }}], backgroundColor: ['#dcefeb', '#168778'], borderWidth: 0, hoverOffset: 5 }] },
+  options: { cutout: '76%', responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { label: item => `${item.label}: ${Number(item.raw).toLocaleString()}` } } } }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,261 @@
+/* ==========================================================================
+   VitalSign Modern Healthcare CSS - Clinical Intelligence System
+   ========================================================================== */
+
+:root {
+    --bg-main: #f8fafc;
+    --navy-dark: #0a192f;
+    --navy-deep: #0f172a;
+    --cyan-accent: #00b4d8;
+    --cyan-light: #e0f2fe;
+    --emerald-green: #10b981;
+    --crimson-red: #ef4444;
+    --amber-warning: #f59e0b;
+    --slate-border: #e2e8f0;
+    --text-primary: #1e293b;
+    --text-muted: #64748b;
+    --card-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.03);
+    --card-hover-shadow: 0 20px 30px -10px rgba(15, 23, 42, 0.1), 0 10px 15px -5px rgba(15, 23, 42, 0.05);
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* Navbar */
+.bg-dark-navy {
+    background: linear-gradient(135deg, #0a192f 0%, #112240 100%) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.brand-icon-wrapper {
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.2);
+}
+
+.brand-pulse {
+    animation: heartbeat 1.8s infinite;
+}
+
+@keyframes heartbeat {
+    0% { transform: scale(1); }
+    14% { transform: scale(1.15); }
+    28% { transform: scale(1); }
+    42% { transform: scale(1.18); }
+    70% { transform: scale(1); }
+}
+
+.brand-title {
+    font-size: 1.25rem;
+    color: #ffffff;
+    letter-spacing: 0.5px;
+    line-height: 1.1;
+}
+
+.text-cyan {
+    color: var(--cyan-accent) !important;
+}
+
+.brand-subtitle {
+    font-size: 0.65rem;
+    color: #94a3b8;
+    letter-spacing: 1.2px;
+}
+
+.navbar-nav .nav-link {
+    color: #cbd5e1 !important;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.navbar-nav .nav-link:hover {
+    color: #ffffff !important;
+    background: rgba(255, 255, 255, 0.06);
+    transform: translateY(-1px);
+}
+
+.live-status-pill {
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: #34d399;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 0.35rem 0.8rem;
+    border-radius: 50px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.live-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #10b981;
+    border-radius: 50%;
+    box-shadow: 0 0 10px #10b981;
+    animation: pulseDot 2s infinite;
+}
+
+@keyframes pulseDot {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+.btn-action-pulse {
+    background: linear-gradient(135deg, #00b4d8 0%, #0077b6 100%);
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 0.88rem;
+    border-radius: 10px;
+    padding: 0.5rem 1.2rem;
+    border: none;
+    transition: all 0.25s ease;
+}
+
+.btn-action-pulse:hover {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    color: #ffffff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 180, 216, 0.35);
+}
+
+/* Modern Hero Section */
+.hero-glass {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 60%, #0c4a6e 100%);
+    border-radius: 20px;
+    padding: 3.5rem 2.5rem;
+    color: #ffffff;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.hero-glass::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(0, 180, 216, 0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+}
+
+/* Cards & Surface Elements */
+.card-vital {
+    background: #ffffff;
+    border: 1px solid var(--slate-border);
+    border-radius: 16px;
+    box-shadow: var(--card-shadow);
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-vital:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--card-hover-shadow);
+    border-color: #cbd5e1;
+}
+
+.card-header-vital {
+    background: #ffffff;
+    border-bottom: 1px solid var(--slate-border);
+    padding: 1.25rem 1.5rem;
+    font-weight: 700;
+    font-size: 1.05rem;
+    border-radius: 16px 16px 0 0 !important;
+}
+
+/* Stat Cards */
+.stat-box {
+    background: #ffffff;
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 1px solid var(--slate-border);
+    box-shadow: var(--card-shadow);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s ease;
+}
+
+.stat-box:hover {
+    transform: translateY(-3px);
+}
+
+.stat-box::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 5px;
+    background-color: var(--cyan-accent);
+}
+
+.stat-box.emerald::after { background-color: var(--emerald-green); }
+.stat-box.crimson::after { background-color: var(--crimson-red); }
+.stat-box.amber::after { background-color: var(--amber-warning); }
+
+/* Custom Inputs & Controls */
+.form-control, .form-select {
+    border-radius: 10px;
+    border: 1.5px solid #cbd5e1;
+    padding: 0.65rem 0.95rem;
+    font-size: 0.92rem;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: var(--cyan-accent);
+    box-shadow: 0 0 0 4px rgba(0, 180, 216, 0.15);
+}
+
+/* Custom Badges */
+.badge-soft-success {
+    background: #dcfce7;
+    color: #15803d;
+    font-weight: 600;
+}
+
+.badge-soft-danger {
+    background: #fee2e2;
+    color: #b91c1c;
+    font-weight: 600;
+}
+
+.badge-soft-warning {
+    background: #fef3c7;
+    color: #b45309;
+    font-weight: 600;
+}
+
+.badge-soft-info {
+    background: #e0f2fe;
+    color: #0369a1;
+    font-weight: 600;
+}
+
+/* Custom Footer */
+.footer-custom {
+    background: #0f172a;
+    color: #94a3b8;
+    border-top: 1px solid #1e293b;
+}
+
+.bg-slate {
+    background-color: #1e293b !important;
+}

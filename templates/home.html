@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Home · VitalSign Clinical System{% endblock %}
+{% block eyebrow %}Project Overview{% endblock %}
+
+{% block content %}
+<div class="page">
+  <section class="hero">
+    <div>
+      <span class="mark">Healthcare · Machine Learning · 30-Day Readmission Prediction</span>
+      <h1>Predict patient deterioration before it becomes an emergency.</h1>
+      <p>VitalSign analyzes 26 physiological and clinical attributes — from hemodynamic vitals (Heart Rate, Blood Pressure, SpO2) to metabolic markers (Glucose, HbA1c) and hospital metadata — to forecast 30-day readmission risk, enabling earlier clinical intervention.</p>
+      <div class="buttons">
+        <a href="{{ url_for('prediction') }}" class="btn">Run Risk Prediction</a>
+        <a href="{{ url_for('visualization') }}" class="btn secondary">EDA &amp; Features</a>
+        <a href="{{ url_for('dashboard') }}" class="btn secondary">Live Dashboard</a>
+      </div>
+    </div>
+    <div class="gauge-wrap">
+      <div class="gauge"><div class="reading"><span class="big">{{ stats.readmission_rate }}%</span><span class="small">Readmission Rate</span></div></div>
+      <div class="gauge-caption" style="margin-top:10px;">{{ stats.readmission_count }} of {{ stats.total_patients }} patients</div>
+    </div>
+  </section>
+
+  <div class="stat-strip">
+    <div class="stat"><span class="n">{{ stats.total_patients }}</span><span class="l">Patient Encounters</span></div>
+    <div class="stat"><span class="n">{{ stats.total_features }}</span><span class="l">Clinical Features</span></div>
+    <div class="stat"><span class="n" style="font-size:16px; padding-top:4px;">{{ metrics.best_model }}</span><span class="l">Optimal Classifier</span></div>
+    <div class="stat"><span class="n" style="color:var(--stable);">{{ metrics.metrics[metrics.best_model].accuracy }}%</span><span class="l">Validation Accuracy</span></div>
+  </div>
+
+  <h2>6-Module Project Pipeline</h2>
+  <div class="cards">
+    <div class="card"><span class="idx">Module 1 · Data Loading</span><h3>Dataset Ingestion &amp; EDA</h3><p>Loads 50,000 patient records from Kaggle, identifies missing values, duplicates, and initial statistical distributions.</p></div>
+    <div class="card"><span class="idx">Module 2 · Preprocessing</span><h3>Cleaning &amp; Encoding</h3><p>Label encoding, One-Hot dummy encoding, and missing value imputation for categorical clinical variables.</p></div>
+    <div class="card"><span class="idx">Module 3 · Normalization</span><h3>Feature Scaling</h3><p>StandardScaler Z-score normalization and Min-Max scaling on continuous vitals to eliminate feature magnitude bias.</p></div>
+    <div class="card"><span class="idx">Module 4 · Classification</span><h3>Supervised ML Models</h3><p>Compares Logistic Regression, Ridge Classifier, Decision Tree, Random Forest, SVM, KNN, AdaBoost, and Gradient Boosting classifiers.</p></div>
+    <div class="card"><span class="idx">Module 5 · Evaluation</span><h3>Model Assessment</h3><p>Confusion matrix analysis, Precision, Recall, F1-Score, ROC-AUC, and Before vs After comparative benchmarking.</p></div>
+    <div class="card" style="border-color:var(--teal); background:var(--teal-light);"><span class="idx">Module 6 · Deployment</span><h3>Live Inference Engine</h3><p>Flask web app serving real-time patient risk scores, clinical risk tiers, and intervention advisories via the prediction UI.</p></div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{
+  "module": "Module 6 \u00e2\u20ac\u201d Deployment & Inference",
+  "project": "VitalSign \u00e2\u20ac\u201d 30-Day Readmission Prediction",
+  "model_type": "Random Forest Classifier",
+  "n_estimators": 100,
+  "max_depth": 8,
+  "dataset_size": 50000,
+  "performance": {
+    "accuracy": "77.72%",
+    "f1_score": "80.14%",
+    "roc_auc": "85.86%"
+  },
+  "risk_tiers": {
+    "LOW": "probability < 25%",
+    "MODERATE": "probability 25\u00e2\u20ac\u201c45%",
+    "HIGH": "probability 45\u00e2\u20ac\u201c70%",
+    "CRITICAL": "probability >= 70%"
+  },
+  "flask_app": "python app.py \u00e2\u2020\u2019 http://127.0.0.1:5000",
+  "inference_endpoint": "POST /prediction"
+}

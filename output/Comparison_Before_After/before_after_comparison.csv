@@ -1,0 +1,8 @@
+Evaluation Metric,Before (Baseline),After (Optimized),Improvement (Delta)
+Accuracy,74.04%,77.72%,+3.68%
+Precision,75.54%,77.89%,+2.36%
+Recall,77.42%,82.53%,+5.10%
+F1-Score,76.47%,80.14%,+3.67%
+ROC-AUC,82.01%,85.86%,+3.85%
+Log Loss,0.5157,0.4970,-0.0186
+False Negatives (Missed),1230,952,-278 (-22.6%)

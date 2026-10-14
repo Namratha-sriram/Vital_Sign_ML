@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Preprocessing · VitalSign{% endblock %}
+{% block eyebrow %}Modules 2 &amp; 3 — Data Pipeline{% endblock %}
+
+{% block content %}
+<div class="page">
+  <h1>Data Preprocessing &amp; Feature Transformation</h1>
+  <p class="lede">Systematic transformation from raw Kaggle hospital encounter records into standardized, model-ready training matrices — Modules 2 and 3 of the VitalSign pipeline.</p>
+
+  <h2>Module 2 — Encoding &amp; Cleaning</h2>
+  <div class="cards">
+    <div class="card">
+      <span class="idx">Stage 01 · Cleaning</span>
+      <h3>Missing Value Imputation</h3>
+      <p>Identifies null sentinel flags (<code>?</code> or <code>None</code>) and imputes median values for continuous vitals and modal categories for admission type codes.</p>
+    </div>
+    <div class="card">
+      <span class="idx">Stage 02 · Label Encoding</span>
+      <h3>Ordinal Category Mapping</h3>
+      <p>Deterministic integer mapping for <code>gender</code>, <code>insulin</code>, <code>A1Cresult</code>, and <code>max_glu_serum</code> — preserving ordinal relationships in tree-based classifiers.</p>
+    </div>
+    <div class="card">
+      <span class="idx">Stage 03 · One-Hot Encoding</span>
+      <h3>Nominal Dummy Variables</h3>
+      <p>Converts <code>admission_type_id</code> and <code>admission_source_id</code> into binary indicator columns via <code>pd.get_dummies(..., drop_first=True)</code> to prevent dummy variable trap.</p>
+    </div>
+  </div>
+
+  <h2>Module 3 — Scaling &amp; Normalization</h2>
+  <div class="cards">
+    <div class="card">
+      <span class="idx">Min-Max Scaling [0, 1]</span>
+      <h3>Range Normalization</h3>
+      <p>Formula: <code>(X − min) / (max − min)</code>. Compresses all continuous vitals to the [0, 1] range. Sensitive to outliers but useful for KNN and neural architectures.</p>
+    </div>
+    <div class="card">
+      <span class="idx">Z-Score Standardization</span>
+      <h3>Unit Normal Scaling (μ=0, σ=1)</h3>
+      <p>Formula: <code>(X − mean) / std</code>. Applied to Heart Rate, Blood Pressure, Glucose, SpO2 via <code>StandardScaler</code> fitted only on training data to prevent data leakage.</p>
+    </div>
+    <div class="card">
+      <span class="idx">Train/Test Split</span>
+      <h3>Stratified Partition (80/20)</h3>
+      <p>50,000 records split with <code>stratify=y</code> so both train and test retain the 23.7% readmission ratio. Scaler fit strictly on train, applied (transformed) on test.</p>
+    </div>
+  </div>
+
+  <h2>Python Implementation</h2>
+  <pre><code># Module 2 — Label Encoding (01_label_encoding.py)
+mappings = {'gender': {'Female':0, 'Male':1},
+            'insulin': {'No':0, 'Down':1, 'Steady':2, 'Up':3}}
+for col, m in mappings.items():
+    df[col + '_encoded'] = df[col].map(m).fillna(0).astype(int)
+
+# Module 2 — One-Hot Encoding (02_one_hot_encoding.py)
+df_encoded = pd.get_dummies(df, columns=['admission_type_id'], drop_first=True)
+
+# Module 3 — Stratified split + Z-Score (clean_minmax_stand_norma_M2.py)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.20, random_state=42, stratify=y)
+
+scaler = StandardScaler()
+X_train[numeric_cols] = scaler.fit_transform(X_train[numeric_cols])
+X_test[numeric_cols]  = scaler.transform(X_test[numeric_cols])   # No leakage</code></pre>
+</div>
+{% endblock %}

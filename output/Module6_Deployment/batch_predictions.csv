@@ -1,0 +1,11 @@
+patient_id,heart_rate,systolic_bp,blood_glucose,oxygen_saturation,time_in_hospital,number_emergency,readmission_probability,risk_tier,prediction,prediction_label,clinical_advisory
+P0001,65,115,110,99,1,0,0.0,LOW,0,Stable (Low Risk),Low readmission risk. Standard discharge protocol.
+P0002,70,119,122,98,1,1,0.0,LOW,0,Stable (Low Risk),Low readmission risk. Standard discharge protocol.
+P0003,75,123,134,97,2,2,14.0,LOW,0,Stable (Low Risk),Low readmission risk. Standard discharge protocol.
+P0004,80,127,146,96,2,0,0.0,LOW,0,Stable (Low Risk),Low readmission risk. Standard discharge protocol.
+P0005,85,131,158,95,3,1,0.0,LOW,0,Stable (Low Risk),Low readmission risk. Standard discharge protocol.
+P0006,90,135,170,94,3,2,14.0,LOW,0,Stable (Low Risk),Low readmission risk. Standard discharge protocol.
+P0007,95,139,182,93,4,0,20.0,LOW,0,Stable (Low Risk),Low readmission risk. Standard discharge protocol.
+P0008,100,143,194,92,4,1,58.0,HIGH,1,Readmitted (High Risk),High readmission risk. Prioritize discharge planning.
+P0009,105,147,206,91,5,2,90.0,CRITICAL,1,Readmitted (High Risk),Immediate intervention required. Schedule ICU review.
+P0010,110,151,218,90,5,0,76.0,CRITICAL,1,Readmitted (High Risk),Immediate intervention required. Schedule ICU review.

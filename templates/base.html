@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}VitalSign · Clinical Risk Prediction{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="shell">
+
+  <!-- Left Sidebar Rail -->
+  <aside class="rail" id="rail">
+    <div class="rail-brand">
+      <div class="brand-lockup">
+        <span class="brand-icon" aria-hidden="true">V</span>
+        <span><span class="name">VitalSign</span><span class="brand-subtitle">Clinical analytics</span></span>
+      </div>
+      <span class="mark">PATIENT RISK INTELLIGENCE</span>
+    </div>
+
+    <nav class="rail-nav">
+      <div class="rail-sep">Core</div>
+      <a href="{{ url_for('home') }}"          class="{{ 'active' if active=='home'          else '' }}"><span class="num">01</span>Home</a>
+      <a href="{{ url_for('about') }}"         class="{{ 'active' if active=='about'         else '' }}"><span class="num">02</span>About</a>
+      <a href="{{ url_for('dataset') }}"       class="{{ 'active' if active=='dataset'       else '' }}"><span class="num">03</span>Dataset</a>
+      <a href="{{ url_for('upload') }}"        class="{{ 'active' if active=='upload'        else '' }}"><span class="num">04</span>Upload &amp; Analyze</a>
+
+      <div class="rail-sep">Pipeline</div>
+      <a href="{{ url_for('preprocessing') }}" class="{{ 'active' if active=='preprocessing' else '' }}"><span class="num">05</span>Preprocessing</a>
+      <a href="{{ url_for('visualization') }}" class="{{ 'active' if active=='visualization' else '' }}"><span class="num">06</span>Visualization</a>
+      <a href="{{ url_for('models') }}"        class="{{ 'active' if active=='models'        else '' }}"><span class="num">07</span>Models</a>
+      <a href="{{ url_for('prediction') }}"    class="{{ 'active' if active=='prediction'    else '' }}"><span class="num">08</span>Prediction</a>
+      <a href="{{ url_for('comparison') }}"    class="{{ 'active' if active=='comparison'    else '' }}"><span class="num">09</span>Before vs After</a>
+
+      <div class="rail-sep">Analytics</div>
+      <a href="{{ url_for('dashboard') }}"     class="{{ 'active' if active=='dashboard'     else '' }}"><span class="num">10</span>Dashboard</a>
+      <a href="{{ url_for('reports') }}"       class="{{ 'active' if active=='reports'       else '' }}"><span class="num">11</span>Reports</a>
+      <a href="{{ url_for('contact') }}"       class="{{ 'active' if active=='contact'       else '' }}"><span class="num">12</span>Contact</a>
+    </nav>
+
+    <div class="rail-foot">
+      <span class="foot-indicator"></span> Workspace ready
+      <div class="foot-caption">Clinical decision support · ML</div>
+    </div>
+  </aside>
+
+  <!-- Main Content Area -->
+  <div class="main">
+    <div class="topbar">
+      <span class="eyebrow">{% block eyebrow %}Overview{% endblock %}</span>
+      <span class="pill"><span class="status-dot"></span> VitalSign workspace</span>
+    </div>
+
+    <div class="content">
+      {% block content %}{% endblock %}
+    </div>
+  </div>
+
+</div>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,83 @@
+{
+    "baseline_model": "Baseline Logistic Regression",
+    "optimized_model": "Optimized Random Forest Classifier",
+    "dataset_size": 50000,
+    "test_samples": 10000,
+    "metrics_before": {
+        "accuracy": 74.04,
+        "precision": 75.54,
+        "recall": 77.42,
+        "f1_score": 76.47,
+        "roc_auc": 82.01,
+        "log_loss": 0.5157,
+        "false_negatives": 1230
+    },
+    "metrics_after": {
+        "accuracy": 77.72,
+        "precision": 77.89,
+        "recall": 82.53,
+        "f1_score": 80.14,
+        "roc_auc": 85.86,
+        "log_loss": 0.497,
+        "false_negatives": 952
+    },
+    "improvements": {
+        "accuracy_delta": "+3.68%",
+        "precision_delta": "+2.36%",
+        "recall_delta": "+5.10%",
+        "f1_delta": "+3.67%",
+        "roc_auc_delta": "+3.85%",
+        "fn_reduction": "-278 (22.6% fewer missed patients)"
+    },
+    "confusion_matrix_before": [
+        [
+            3186,
+            1366
+        ],
+        [
+            1230,
+            4218
+        ]
+    ],
+    "confusion_matrix_after": [
+        [
+            3276,
+            1276
+        ],
+        [
+            952,
+            4496
+        ]
+    ],
+    "preprocessing": {
+        "total_records": 50000,
+        "before_features_count": 21,
+        "after_features_count": 28,
+        "missing_values_before": 72574,
+        "missing_values_after": 0,
+        "blood_glucose_raw": {
+            "mean": 181.99,
+            "std": 62.05,
+            "min": 75.0,
+            "max": 289.0
+        },
+        "blood_glucose_scaled": {
+            "mean": 0.0,
+            "std": 1.0,
+            "min": -1.7241,
+            "max": 1.7246
+        },
+        "systolic_bp_raw": {
+            "mean": 134.51,
+            "std": 23.16,
+            "min": 95.0,
+            "max": 174.0
+        },
+        "systolic_bp_scaled": {
+            "mean": 0.0,
+            "std": 1.0,
+            "min": -1.7057,
+            "max": 1.7048
+        }
+    }
+}

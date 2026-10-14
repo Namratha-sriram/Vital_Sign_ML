@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+{% block title %}Prediction · VitalSign Prediction System{% endblock %}
+{% block eyebrow %}Prediction{% endblock %}
+
+{% block content %}
+<div class="page">
+  <h1>Patient Deterioration &amp; Readmission Prediction</h1>
+  <p class="lede">Fill in a patient's vital telemetry and encounter profile to receive an immediate deterioration risk assessment from the trained model.</p>
+
+  {% if error %}
+  <div class="result-card warning" role="alert" style="margin-bottom:20px;">{{ error }}</div>
+  {% endif %}
+
+  <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+    <button type="button" class="btn secondary" onclick="fillCase('critical')">Load High-Risk Sample</button>
+    <button type="button" class="btn secondary" onclick="fillCase('stable')">Load Stable Sample</button>
+  </div>
+
+  <form method="POST" action="/prediction">
+    <fieldset>
+      <legend>1. Demographics &amp; Admission Codes</legend>
+      <div class="field-grid">
+        <div>
+          <label>Age (Years)</label>
+          <input type="number" id="age" name="age" value="{{ form_data.age | default(65) }}" min="1" max="110" required>
+        </div>
+        <div>
+          <label>Gender</label>
+          <select id="gender" name="gender">
+            <option value="Male" {% if form_data.gender == 'Male' %}selected{% endif %}>Male</option>
+            <option value="Female" {% if form_data.gender == 'Female' %}selected{% endif %}>Female</option>
+          </select>
+        </div>
+        <div>
+          <label>Admission Type</label>
+          <select id="admission_type_id" name="admission_type_id">
+            {% for k, v in adm_types.items() %}
+            <option value="{{ k }}" {% if form_data.admission_type_id == k or (not form_data and k == 1) %}selected{% endif %}>{{ k }} - {{ v }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label>Discharge Disposition</label>
+          <select id="discharge_disposition_id" name="discharge_disposition_id">
+            {% for k, v in disch_disps.items() %}
+            <option value="{{ k }}" {% if form_data.discharge_disposition_id == k or (not form_data and k == 1) %}selected{% endif %}>{{ k }} - {{ v }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label>Admission Source</label>
+          <select id="admission_source_id" name="admission_source_id">
+            {% for k, v in adm_srcs.items() %}
+            <option value="{{ k }}" {% if form_data.admission_source_id == k or (not form_data and k == 7) %}selected{% endif %}>{{ k }} - {{ v }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>2. Physiological Vital Signs</legend>
+      <div class="field-grid">
+        <div>
+          <label>Heart Rate (bpm)</label>
+          <input type="number" id="heart_rate" name="heart_rate" value="{{ form_data.heart_rate | default(85) }}" min="40" max="220" required>
+        </div>
+        <div>
+          <label>Systolic Blood Pressure (mmHg)</label>
+          <input type="number" id="systolic_bp" name="systolic_bp" value="{{ form_data.systolic_bp | default(140) }}" min="70" max="250" required>
+        </div>
+        <div>
+          <label>Diastolic Blood Pressure (mmHg)</label>
+          <input type="number" id="diastolic_bp" name="diastolic_bp" value="{{ form_data.diastolic_bp | default(88) }}" min="40" max="150" required>
+        </div>
+        <div>
+          <label>Blood Glucose (mg/dL)</label>
+          <input type="number" id="blood_glucose" name="blood_glucose" value="{{ form_data.blood_glucose | default(185) }}" min="40" max="550" required>
+        </div>
+        <div>
+          <label>Oxygen Saturation SpO2 (%)</label>
+          <input type="number" id="oxygen_saturation" name="oxygen_saturation" value="{{ form_data.oxygen_saturation | default(93) }}" min="60" max="100" required>
+        </div>
+        <div>
+          <label>Respiratory Rate (/min)</label>
+          <input type="number" id="respiratory_rate" name="respiratory_rate" value="{{ form_data.respiratory_rate | default(20) }}" min="8" max="60" required>
+        </div>
+        <div>
+          <label>Body Temperature (&deg;C)</label>
+          <input type="number" step="0.1" id="body_temperature" name="body_temperature" value="{{ form_data.body_temperature | default(37.4) }}" min="33" max="43" required>
+        </div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>3. Encounter History &amp; Laboratory Biomarkers</legend>
+      <div class="field-grid">
+        <div>
+          <label>Length of Stay (Days)</label>
+          <input type="number" id="time_in_hospital" name="time_in_hospital" value="{{ form_data.time_in_hospital | default(5) }}" min="1" max="60" required>
+        </div>
+        <div>
+          <label>Emergency Visits in Prior Year</label>
+          <input type="number" id="number_emergency" name="number_emergency" value="{{ form_data.number_emergency | default(1) }}" min="0" max="25" required>
+        </div>
+        <div>
+          <label>Lab Procedures Performed</label>
+          <input type="number" id="num_lab_procedures" name="num_lab_procedures" value="{{ form_data.num_lab_procedures | default(45) }}" min="1" max="150" required>
+        </div>
+        <div>
+          <label>Total Prescribed Medications</label>
+          <input type="number" id="num_medications" name="num_medications" value="{{ form_data.num_medications | default(16) }}" min="1" max="80" required>
+        </div>
+        <div>
+          <label>Max Glucose Serum Test</label>
+          <select id="max_glu_serum" name="max_glu_serum">
+            <option value="None" {% if form_data.max_glu_serum == 'None' %}selected{% endif %}>None (Not tested)</option>
+            <option value="Norm" {% if form_data.max_glu_serum == 'Norm' %}selected{% endif %}>Norm (Normal)</option>
+            <option value=">200" {% if form_data.max_glu_serum == '>200' or (not form_data) %}selected{% endif %}>&gt;200 mg/dL</option>
+            <option value=">300" {% if form_data.max_glu_serum == '>300' %}selected{% endif %}>&gt;300 mg/dL</option>
+          </select>
+        </div>
+        <div>
+          <label>HbA1c Result</label>
+          <select id="A1Cresult" name="A1Cresult">
+            <option value="None" {% if form_data.A1Cresult == 'None' %}selected{% endif %}>None</option>
+            <option value="Norm" {% if form_data.A1Cresult == 'Norm' %}selected{% endif %}>Norm</option>
+            <option value=">7" {% if form_data.A1Cresult == '>7' %}selected{% endif %}>&gt;7%</option>
+            <option value=">8" {% if form_data.A1Cresult == '>8' or (not form_data) %}selected{% endif %}>&gt;8%</option>
+          </select>
+        </div>
+        <div>
+          <label>Insulin Dosage Shift</label>
+          <select id="insulin" name="insulin">
+            <option value="No" {% if form_data.insulin == 'No' %}selected{% endif %}>No (Not prescribed)</option>
+            <option value="Steady" {% if form_data.insulin == 'Steady' or (not form_data) %}selected{% endif %}>Steady</option>
+            <option value="Up" {% if form_data.insulin == 'Up' %}selected{% endif %}>Up (Dosage Escalated)</option>
+            <option value="Down" {% if form_data.insulin == 'Down' %}selected{% endif %}>Down</option>
+          </select>
+        </div>
+      </div>
+    </fieldset>
+
+    <div style="margin-top: 24px;">
+      <button type="submit" class="btn" style="padding: 12px 24px; font-size: 15px;">Run Patient Prediction</button>
+    </div>
+  </form>
+
+  {% if result %}
+  <div class="result-card {% if result.prediction == 1 %}critical{% else %}stable{% endif %}">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+      <span class="idx">DIAGNOSTIC OUTCOME</span>
+      <span class="badge-status {% if result.prediction == 1 %}badge-risk{% else %}badge-stable{% endif %}">
+        {{ result.risk_level }}
+      </span>
+    </div>
+
+    <div style="display: flex; align-items: baseline; gap: 16px; margin-bottom: 16px;">
+      <span style="font-family: var(--mono); font-size: 48px; font-weight: 700; color: {% if result.prediction == 1 %}var(--risk){% else %}var(--stable){% endif %};">
+        {{ result.probability }}%
+      </span>
+      <span style="color: var(--text-muted); font-size: 14px;">Estimated 30-Day Readmission / Deterioration Probability</span>
+    </div>
+
+    <h4 style="font-family: var(--display); font-size: 16px; margin-bottom: 8px;">Targeted Clinical Recommendations:</h4>
+    <ul style="font-size: 13.5px; color: var(--text-muted); padding-left: 20px; line-height: 1.8;">
+      {% for rec in result.recommendations %}
+      <li>{{ rec }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+</div>
+
+<script>
+function fillCase(type) {
+  if (type === 'critical') {
+    document.getElementById('age').value = 72;
+    document.getElementById('gender').value = 'Female';
+    document.getElementById('admission_type_id').value = 1;
+    document.getElementById('heart_rate').value = 106;
+    document.getElementById('systolic_bp').value = 168;
+    document.getElementById('diastolic_bp').value = 96;
+    document.getElementById('blood_glucose').value = 260;
+    document.getElementById('oxygen_saturation').value = 91;
+    document.getElementById('respiratory_rate').value = 26;
+    document.getElementById('body_temperature').value = 38.3;
+    document.getElementById('time_in_hospital').value = 8;
+    document.getElementById('number_emergency').value = 3;
+    document.getElementById('max_glu_serum').value = '>300';
+    document.getElementById('A1Cresult').value = '>8';
+    document.getElementById('insulin').value = 'Up';
+  } else {
+    document.getElementById('age').value = 45;
+    document.getElementById('gender').value = 'Male';
+    document.getElementById('admission_type_id').value = 3;
+    document.getElementById('heart_rate').value = 72;
+    document.getElementById('systolic_bp').value = 118;
+    document.getElementById('diastolic_bp').value = 78;
+    document.getElementById('blood_glucose').value = 95;
+    document.getElementById('oxygen_saturation').value = 99;
+    document.getElementById('respiratory_rate').value = 15;
+    document.getElementById('body_temperature').value = 36.6;
+    document.getElementById('time_in_hospital').value = 2;
+    document.getElementById('number_emergency').value = 0;
+    document.getElementById('max_glu_serum').value = 'Norm';
+    document.getElementById('A1Cresult').value = 'Norm';
+    document.getElementById('insulin').value = 'Steady';
+  }
+}
+</script>
+{% endblock %}

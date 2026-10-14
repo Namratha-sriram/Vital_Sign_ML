@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Contact · VitalSign Information{% endblock %}
+{% block eyebrow %}Academic Documentation{% endblock %}
+
+{% block content %}
+<div class="page">
+  <h1>Project Documentation &amp; Academic Credentials</h1>
+  <p class="lede">Capstone project deliverables, repository paths, and technical specifications for the B.Tech Computer Science and Engineering curriculum.</p>
+
+  <div class="cards">
+    <div class="card">
+      <span class="idx">ACADEMIC PROFILE</span>
+      <h3>Capstone Project Overview</h3>
+      <table style="margin-top: 12px;">
+        <tr>
+          <td style="padding: 6px 0; font-weight: 600; width: 140px;">Project Title:</td>
+          <td style="padding: 6px 0;">VitalSign Prediction System</td>
+        </tr>
+        <tr>
+          <td style="padding: 6px 0; font-weight: 600;">Academic Degree:</td>
+          <td style="padding: 6px 0;">Bachelor of Technology (B.Tech)</td>
+        </tr>
+        <tr>
+          <td style="padding: 6px 0; font-weight: 600;">Department:</td>
+          <td style="padding: 6px 0;">Computer Science and Engineering (CSE)</td>
+        </tr>
+        <tr>
+          <td style="padding: 6px 0; font-weight: 600;">Domain:</td>
+          <td style="padding: 6px 0;">Machine Learning &amp; Clinical Informatics</td>
+        </tr>
+        <tr>
+          <td style="padding: 6px 0; font-weight: 600;">Cohort Size:</td>
+          <td style="padding: 6px 0;">50,000 Patient Encounters (Capped)</td>
+        </tr>
+        <tr>
+          <td style="padding: 6px 0; font-weight: 600;">IDE &amp; Platform:</td>
+          <td style="padding: 6px 0;">PyCharm on Windows &bull; Python 3.12</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="card">
+      <span class="idx">REFERENCE ARCHITECTURE</span>
+      <h3>Design &amp; Modular Consistency</h3>
+      <p style="margin-bottom: 12px;">This project follows the clean modular design philosophy demonstrated in the reference system <strong>SkillMatch_ML</strong>:</p>
+      <ul style="padding-left: 20px; font-size: 13.5px; color: var(--text-muted); line-height: 1.8;">
+        <li>Fixed ledger rail navigation (Routes 01&ndash;10)</li>
+        <li>Clean, non-distracting typography (Space Grotesk &amp; IBM Plex Mono)</li>
+        <li>Modular academic script decomposition in <code>src/</code></li>
+        <li>Structured dataset evaluation outputs and confusion matrix exports</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>Completed Project Deliverables</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Phase</th>
+          <th>Deliverable Description</th>
+          <th>Implementation File</th>
+          <th>Validation Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>01 Dataset Sourcing</strong></td>
+          <td>Kaggle clinical database ingestion capped at 50,000 patient records</td>
+          <td><code>data/vitalsign_data.csv</code></td>
+          <td><span class="badge-status badge-stable">Completed</span></td>
+        </tr>
+        <tr>
+          <td><strong>02 Metadata Parsing</strong></td>
+          <td>Multi-table ID mapping parser for admission codes and hospital dispositions</td>
+          <td><code>data/IDs_mapping.csv</code></td>
+          <td><span class="badge-status badge-stable">Completed</span></td>
+        </tr>
+        <tr>
+          <td><strong>03 Preprocessing Pipeline</strong></td>
+          <td>StandardScaler normalization and dummy encoding with pure-Python fallback</td>
+          <td><code>src/data_preprocessing.py</code></td>
+          <td><span class="badge-status badge-stable">Completed</span></td>
+        </tr>
+        <tr>
+          <td><strong>04 Model Benchmarking</strong></td>
+          <td>7-algorithm training pipeline (Random Forest, SVM, LR, DT, KNN, AdaBoost, Gradient Boosting)</td>
+          <td><code>src/train_models.py</code></td>
+          <td><span class="badge-status badge-stable">Completed</span></td>
+        </tr>
+        <tr>
+          <td><strong>05 Inference Engine</strong></td>
+          <td>Real-time clinical parameter scoring with risk stratification and advisories</td>
+          <td><code>src/predict.py</code></td>
+          <td><span class="badge-status badge-stable">Completed</span></td>
+        </tr>
+        <tr>
+          <td><strong>06 Web User Interface</strong></td>
+          <td>Responsive 10-view Flask application styled with the neat ledger design system</td>
+          <td><code>app.py &bull; templates/</code></td>
+          <td><span class="badge-status badge-stable">Completed</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Repository &amp; Local Execution</h2>
+  <div class="card">
+    <span class="idx">LOCAL ENVIRONMENT</span>
+    <h3>Windows Local File System Paths</h3>
+    <p style="margin-bottom: 8px;">Workspace Directory:</p>
+    <pre style="background: var(--paper); padding: 10px 14px; border: 1px solid var(--line); border-radius: var(--radius); font-family: var(--mono); font-size: 12.5px; margin-bottom: 14px; overflow-x: auto;">C:\Users\namra\PycharmProjects\vital_sign</pre>
+    <p style="margin-bottom: 8px;">Run Local Web Application:</p>
+    <pre style="background: var(--paper); padding: 10px 14px; border: 1px solid var(--line); border-radius: var(--radius); font-family: var(--mono); font-size: 12.5px; overflow-x: auto;">python app.py   # Or double-click run_app.bat</pre>
+  </div>
+</div>
+{% endblock %}

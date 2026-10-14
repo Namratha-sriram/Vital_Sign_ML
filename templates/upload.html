@@ -1,0 +1,298 @@
+{% extends "base.html" %}
+{% block title %}Upload Dataset · VitalSign{% endblock %}
+{% block eyebrow %}Live Dataset Upload &amp; Analysis{% endblock %}
+
+{% block content %}
+<div class="page">
+  <h1>Upload &amp; Analyze Your Dataset</h1>
+  <p class="lede">Upload any CSV file to get an instant analysis — column types, missing values, statistical summary, and a preview of the first records. Your project's existing datasets remain untouched.</p>
+
+  <!-- Upload Form -->
+  <div class="card" style="margin-bottom:28px;">
+    <span class="idx">Step 1 — Upload CSV File</span>
+    <h3 style="margin-bottom:12px;">Select a CSV file from your computer</h3>
+    <form method="POST" enctype="multipart/form-data" style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;">
+      <div style="flex:1; min-width:280px;">
+        <label>CSV File (max 20 MB)</label>
+        <input type="file" name="csv_file" accept=".csv" required
+               style="padding:8px; border:2px dashed var(--border); background:var(--bg);">
+      </div>
+      <div>
+        <label>Max Rows to Analyze</label>
+        <select name="max_rows" style="width:160px;">
+          <option value="1000">1,000 rows</option>
+          <option value="5000">5,000 rows</option>
+          <option value="10000" selected>10,000 rows</option>
+          <option value="50000">50,000 rows</option>
+          <option value="0">All rows</option>
+        </select>
+      </div>
+      <button type="submit" class="btn" style="height:38px;">Analyze Dataset →</button>
+    </form>
+  </div>
+
+  <!-- Existing Project Datasets -->
+  <div class="card" style="margin-bottom:28px; background:var(--teal-light); border-color:rgba(26,122,110,0.2);">
+    <span class="idx" style="color:var(--teal);">Project Datasets (Always Available)</span>
+    <h3>Your VitalSign project datasets are preserved:</h3>
+    <div style="display:flex; gap:12px; margin-top:12px; flex-wrap:wrap;">
+      <a href="{{ url_for('download_dataset', filename='vitalsign_data.csv') }}" class="btn secondary">vitalsign_data.csv (50,000 records)</a>
+      <a href="{{ url_for('download_dataset', filename='IDs_mapping.csv') }}" class="btn secondary">IDs_mapping.csv (Hospital codes)</a>
+    </div>
+  </div>
+
+  {% if error %}
+  <div class="result-card warning" style="margin-bottom:24px;">
+    <strong>Error:</strong> {{ error }}
+  </div>
+  {% endif %}
+
+  {% if analysis %}
+  <!-- ── ANALYSIS RESULTS ─────────────────────────── -->
+  <div style="margin-bottom:20px; display:flex; align-items:center; gap:12px;">
+    <h2 style="margin:0;">Analysis Results — {{ analysis.filename }}</h2>
+    <span class="badge-status badge-stable">Analyzed</span>
+  </div>
+
+  <!-- Summary stats strip -->
+  <div class="stat-strip">
+    <div class="stat">
+      <span class="n">{{ "{:,}".format(analysis.total_rows) }}</span>
+      <span class="l">Total Rows</span>
+    </div>
+    <div class="stat">
+      <span class="n">{{ analysis.total_cols }}</span>
+      <span class="l">Columns</span>
+    </div>
+    <div class="stat">
+      <span class="n" style="color:{% if analysis.missing_total > 0 %}var(--risk){% else %}var(--stable){% endif %};">
+        {{ "{:,}".format(analysis.missing_total) }}
+      </span>
+      <span class="l">Missing Values</span>
+    </div>
+    <div class="stat">
+      <span class="n" style="color:{% if analysis.duplicates > 0 %}var(--amber){% else %}var(--stable){% endif %};">
+        {{ "{:,}".format(analysis.duplicates) }}
+      </span>
+      <span class="l">Duplicate Rows</span>
+    </div>
+    <div class="stat">
+      <span class="n">{{ analysis.numeric_cols }}</span>
+      <span class="l">Numeric Columns</span>
+    </div>
+    <div class="stat">
+      <span class="n">{{ analysis.object_cols }}</span>
+      <span class="l">Categorical Columns</span>
+    </div>
+  </div>
+
+  <h2>Graphs from This Upload</h2>
+  <div class="cards">
+    <div class="card">
+      <span class="idx">Missing Values by Column</span>
+      <canvas id="uploadMissingChart" height="200"></canvas>
+    </div>
+    {% if analysis.upload_charts.outcome_labels %}
+    <div class="card">
+      <span class="idx">Observed Outcome Distribution</span>
+      <canvas id="uploadOutcomeChart" height="200"></canvas>
+    </div>
+    {% endif %}
+    {% if analysis.upload_charts.distributions %}
+    <div class="card">
+      <span class="idx">Numeric Feature Distributions (standardized)</span>
+      <canvas id="uploadDistributionChart" height="200"></canvas>
+    </div>
+    {% endif %}
+    {% if analysis.upload_charts.correlation_labels %}
+    <div class="card">
+      <span class="idx">Feature Correlation with Readmission</span>
+      <canvas id="uploadCorrelationChart" height="200"></canvas>
+    </div>
+    {% endif %}
+  </div>
+
+  {% if analysis %}
+  <h2>Patient Risk Predictions</h2>
+  {% if analysis.prediction_rows %}
+  <p class="lede">Predictions use the same trained clinical model as the single-patient form. {{ analysis.prediction_count }} records were scored; the table shows up to 100.</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Patient / Row</th><th>Predicted Outcome</th><th class="num">Readmission Risk</th><th>Risk Level</th></tr>
+      </thead>
+      <tbody>
+        {% for row in analysis.prediction_rows %}
+        <tr>
+          <td>{{ row.patient }}</td>
+          <td>{% if row.prediction == 1 %}Readmitted / At Risk{% else %}Stable{% endif %}</td>
+          <td class="num">{{ row.probability }}%</td>
+          <td><span class="badge-status {% if row.prediction == 1 %}badge-risk{% else %}badge-stable{% endif %}">{{ row.risk_level }}</span></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% elif analysis.prediction_error %}
+  <div class="result-card warning" role="status">{{ analysis.prediction_error }}</div>
+  {% elif analysis.missing_prediction_fields %}
+  <div class="card">
+    <span class="idx">Prediction-compatible format</span>
+    <p>To predict patient outcomes, include the VitalSign input columns: {{ analysis.missing_prediction_fields | join(', ') }}.</p>
+  </div>
+  {% endif %}
+  {% if analysis.skipped_prediction_rows > 0 %}
+  <p class="lede">{{ analysis.skipped_prediction_rows }} rows were skipped because one or more model inputs were blank.</p>
+  {% endif %}
+  {% endif %}
+
+  <!-- Column Info Table -->
+  <h2>Column Information</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Column Name</th>
+          <th>Data Type</th>
+          <th class="num">Missing Values</th>
+          <th class="num">Missing %</th>
+          <th class="num">Unique Values</th>
+          <th>Sample Values</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for col in analysis.columns %}
+        <tr>
+          <td class="num" style="color:var(--muted); font-family:var(--mono); font-size:11px;">{{ loop.index }}</td>
+          <td><strong>{{ col.name }}</strong></td>
+          <td><code>{{ col.dtype }}</code></td>
+          <td class="num" style="color:{% if col.missing > 0 %}var(--risk){% else %}var(--stable){% endif %};">
+            {{ col.missing }}</td>
+          <td class="num">{{ col.missing_pct }}%</td>
+          <td class="num">{{ col.unique }}</td>
+          <td style="font-size:12px; color:var(--muted);">{{ col.samples }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Statistical Summary -->
+  {% if analysis.stats %}
+  <h2>Statistical Summary (Numeric Columns)</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Column</th>
+          <th class="num">Mean</th>
+          <th class="num">Std Dev</th>
+          <th class="num">Min</th>
+          <th class="num">25%</th>
+          <th class="num">Median</th>
+          <th class="num">75%</th>
+          <th class="num">Max</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in analysis.stats %}
+        <tr>
+          <td><strong>{{ row.col }}</strong></td>
+          <td class="num">{{ row.mean }}</td>
+          <td class="num">{{ row.std }}</td>
+          <td class="num">{{ row.min }}</td>
+          <td class="num">{{ row.q25 }}</td>
+          <td class="num">{{ row.median }}</td>
+          <td class="num">{{ row.q75 }}</td>
+          <td class="num">{{ row.max }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  <!-- Data Preview -->
+  <h2>Data Preview (First {{ analysis.preview|length }} Rows)</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          {% for col in analysis.preview_cols %}<th>{{ col }}</th>{% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in analysis.preview %}
+        <tr>
+          <td class="num" style="color:var(--muted); font-size:11px; font-family:var(--mono);">{{ loop.index }}</td>
+          {% for col in analysis.preview_cols %}
+          <td>{{ row[col] if row[col] is not none else '—' }}</td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ML Readiness Assessment -->
+  <h2>ML Readiness Assessment</h2>
+  <div class="cards">
+    <div class="card" style="border-left:3px solid {% if analysis.missing_pct_total < 5 %}var(--stable){% elif analysis.missing_pct_total < 20 %}var(--amber){% else %}var(--risk){% endif %};">
+      <span class="idx">Missing Data</span>
+      <h3>{{ analysis.missing_pct_total }}% Missing</h3>
+      <p>{% if analysis.missing_pct_total < 5 %}Low missing rate — dataset is clean. Proceed with standard imputation.
+         {% elif analysis.missing_pct_total < 20 %}Moderate missing rate — apply median/modal imputation before training.
+         {% else %}High missing rate — consider dropping columns &gt;50% missing or using model-based imputation.{% endif %}</p>
+    </div>
+    <div class="card" style="border-left:3px solid {% if analysis.duplicates == 0 %}var(--stable){% else %}var(--amber){% endif %};">
+      <span class="idx">Duplicate Rows</span>
+      <h3>{{ "{:,}".format(analysis.duplicates) }} Duplicates</h3>
+      <p>{% if analysis.duplicates == 0 %}No duplicates found — data integrity confirmed.
+         {% else %}{{ "{:,}".format(analysis.duplicates) }} duplicate rows detected. Run df.drop_duplicates() before training.{% endif %}</p>
+    </div>
+    <div class="card" style="border-left:3px solid var(--teal);">
+      <span class="idx">Feature Mix</span>
+      <h3>{{ analysis.numeric_cols }} Numeric · {{ analysis.object_cols }} Categorical</h3>
+      <p>{% if analysis.object_cols > 0 %}Apply Label/One-Hot encoding on categorical columns before model training.{% else %}All numeric — apply StandardScaler normalization before SVM/KNN/LR training.{% endif %}</p>
+    </div>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+{% if analysis %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+const uploadCharts = {{ analysis.upload_charts|tojson }};
+const uploadColors = ['#1A7A6E', '#E07B28', '#D44F3E', '#457B9D', '#7B61A8', '#3EA897'];
+const missingCanvas = document.getElementById('uploadMissingChart');
+if (missingCanvas) new Chart(missingCanvas, {
+  type: 'bar',
+  data: { labels: uploadCharts.missing_labels, datasets: [{ label: 'Missing cells', data: uploadCharts.missing_values, backgroundColor: '#D44F3E', borderRadius: 4 }] },
+  options: { indexAxis: 'y', responsive: true, plugins: { legend: { display: false } } }
+});
+const outcomeCanvas = document.getElementById('uploadOutcomeChart');
+if (outcomeCanvas) new Chart(outcomeCanvas, {
+  type: 'doughnut',
+  data: { labels: uploadCharts.outcome_labels, datasets: [{ data: uploadCharts.outcome_values, backgroundColor: ['#1A7A6E', '#D44F3E', '#E07B28', '#9CA3AF'] }] },
+  options: { responsive: true, plugins: { legend: { position: 'bottom' } } }
+});
+const distributionCanvas = document.getElementById('uploadDistributionChart');
+if (distributionCanvas) new Chart(distributionCanvas, {
+  type: 'line',
+  data: { labels: uploadCharts.distribution_labels, datasets: uploadCharts.distributions.map((item, index) => ({ label: item.label, data: item.values, borderColor: uploadColors[index % uploadColors.length], backgroundColor: uploadColors[index % uploadColors.length] + '22', tension: 0.25, fill: false })) },
+  options: { responsive: true, plugins: { legend: { position: 'bottom' } }, scales: { y: { title: { display: true, text: 'Records (%)' } } } }
+});
+const correlationCanvas = document.getElementById('uploadCorrelationChart');
+if (correlationCanvas) new Chart(correlationCanvas, {
+  type: 'bar',
+  data: { labels: uploadCharts.correlation_labels, datasets: [{ label: 'Correlation coefficient', data: uploadCharts.correlation_values, backgroundColor: '#457B9D', borderRadius: 4 }] },
+  options: { indexAxis: 'y', responsive: true, scales: { x: { min: -1, max: 1 } }, plugins: { legend: { display: false } } }
+});
+</script>
+{% endif %}
+{% endblock %}

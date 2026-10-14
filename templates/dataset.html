@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Dataset · VitalSign Prediction System{% endblock %}
+{% block eyebrow %}Dataset{% endblock %}
+
+{% block content %}
+<div class="page">
+  <h1>Clinical Vital Signs &amp; Admission Dataset</h1>
+  <p class="lede">Healthcare multivariate records linking patient physiological vitals with hospital admission and discharge codes.</p>
+
+  <div class="cards">
+    <div class="card">
+      <span class="idx">RECORDS</span>
+      <span class="n">{{ stats.total_patients }}</span>
+      <p>Patient encounters in vitalsign_data.csv</p>
+    </div>
+    <div class="card">
+      <span class="idx">FEATURES</span>
+      <span class="n">{{ stats.total_features }}</span>
+      <p>Continuous vitals &amp; clinical variables</p>
+    </div>
+    <div class="card">
+      <span class="idx">MISSING VALUES</span>
+      <span class="n">{{ stats.missing_values }}</span>
+      <p>Cells with missing or unrecorded entries</p>
+    </div>
+    <div class="card">
+      <span class="idx">DUPLICATE ROWS</span>
+      <span class="n">{{ stats.duplicate_rows }}</span>
+      <p>Exact duplicate encounter entries</p>
+    </div>
+  </div>
+
+  <h2>Clinical Code Lookups (IDs_mapping.csv)</h2>
+  <div class="cards">
+    <div class="card">
+      <span class="idx">ADMISSION TYPES</span>
+      <h3>admission_type_id</h3>
+      <div style="max-height: 160px; overflow-y: auto; font-size: 13px; color: var(--text-muted);">
+        {% for k, v in adm_types.items() %}
+        <div><strong>{{ k }}:</strong> {{ v }}</div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="card">
+      <span class="idx">DISCHARGE DISPOSITIONS</span>
+      <h3>discharge_disposition_id</h3>
+      <div style="max-height: 160px; overflow-y: auto; font-size: 13px; color: var(--text-muted);">
+        {% for k, v in disch_disps.items() %}
+        <div><strong>{{ k }}:</strong> {{ v }}</div>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="card">
+      <span class="idx">ADMISSION SOURCES</span>
+      <h3>admission_source_id</h3>
+      <div style="max-height: 160px; overflow-y: auto; font-size: 13px; color: var(--text-muted);">
+        {% for k, v in adm_srcs.items() %}
+        <div><strong>{{ k }}:</strong> {{ v }}</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <h2>Dataset Sample (First 15 Records)</h2>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          {% for col in columns %}
+          <th>{{ col }}</th>
+          {% endfor %}
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in data %}
+        <tr>
+          {% for col in columns %}
+          <td class="{% if col in ['patient_id', 'age', 'heart_rate', 'systolic_bp', 'blood_glucose'] %}num{% endif %}">
+            {% if col == 'readmitted' %}
+              {% if row[col] == 1 %}
+                <span class="badge-status badge-risk">1 (At Risk)</span>
+              {% else %}
+                <span class="badge-status badge-stable">0 (Stable)</span>
+              {% endif %}
+            {% else %}
+              {{ row[col] }}
+            {% endif %}
+          </td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

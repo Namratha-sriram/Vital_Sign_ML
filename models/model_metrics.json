@@ -1,0 +1,105 @@
+{
+    "best_model": "AdaBoost",
+    "metrics": {
+        "Logistic Regression": {
+            "accuracy": 74.04,
+            "precision": 75.54,
+            "recall": 77.42,
+            "f1_score": 76.47,
+            "roc_auc": 82.01,
+            "cv_accuracy_mean": 74.3,
+            "cv_accuracy_std": 0.59
+        },
+        "Ridge Classifier": {
+            "accuracy": 74.09,
+            "precision": 75.57,
+            "recall": 77.5,
+            "f1_score": 76.52,
+            "roc_auc": 82.03,
+            "cv_accuracy_mean": 74.32,
+            "cv_accuracy_std": 0.54
+        },
+        "Decision Tree": {
+            "accuracy": 75.42,
+            "precision": 77.73,
+            "recall": 76.93,
+            "f1_score": 77.32,
+            "roc_auc": 83.95,
+            "cv_accuracy_mean": 74.06,
+            "cv_accuracy_std": 2.07
+        },
+        "Random Forest": {
+            "accuracy": 77.68,
+            "precision": 77.81,
+            "recall": 82.58,
+            "f1_score": 80.12,
+            "roc_auc": 85.87,
+            "cv_accuracy_mean": 76.48,
+            "cv_accuracy_std": 0.81
+        },
+        "Support Vector Machine (SVM)": {
+            "accuracy": 73.11,
+            "precision": 74.07,
+            "recall": 77.92,
+            "f1_score": 75.95,
+            "roc_auc": 80.71,
+            "cv_accuracy_mean": 74.22,
+            "cv_accuracy_std": 0.5
+        },
+        "K-Nearest Neighbors (KNN)": {
+            "accuracy": 68.64,
+            "precision": 70.28,
+            "recall": 73.53,
+            "f1_score": 71.87,
+            "roc_auc": 73.44,
+            "cv_accuracy_mean": 68.38,
+            "cv_accuracy_std": 0.74
+        },
+        "AdaBoost": {
+            "accuracy": 78.05,
+            "precision": 78.39,
+            "recall": 82.43,
+            "f1_score": 80.36,
+            "roc_auc": 86.62,
+            "cv_accuracy_mean": 78.54,
+            "cv_accuracy_std": 0.73
+        },
+        "Gradient Boosting": {
+            "accuracy": 78.05,
+            "precision": 79.3,
+            "recall": 80.8,
+            "f1_score": 80.04,
+            "roc_auc": 86.53,
+            "cv_accuracy_mean": 77.78,
+            "cv_accuracy_std": 0.48
+        }
+    },
+    "feature_importance": {
+        "oxygen_saturation": 26.002,
+        "blood_glucose": 21.261,
+        "number_emergency": 13.496,
+        "age": 11.012,
+        "systolic_bp": 9.622,
+        "time_in_hospital": 5.741,
+        "A1Cresult_>8": 2.813,
+        "admission_type_id_2": 2.459,
+        "admission_type_id_3": 1.883,
+        "num_lab_procedures": 0.797
+    },
+    "confusion_matrix": [
+        [
+            3314,
+            1238
+        ],
+        [
+            957,
+            4491
+        ]
+    ],
+    "dataset_summary": {
+        "total_samples": 50000,
+        "train_samples": 40000,
+        "test_samples": 10000,
+        "features_count": 28
+    }
+}
